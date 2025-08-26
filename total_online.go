@@ -11,16 +11,13 @@ type TotalOnline interface {
 }
 
 type TotalOnlineConfig struct {
-	App  string
-	Tags []string
-}
-
-type totalOnline struct {
-	prometheusTotal prometheus.GaugeVec
+	App          string
+	Tags         []string
+	MustRegister bool
 }
 
 func NewTotalOnline(config *TotalOnlineConfig) TotalOnline {
-	m := &totalOnline{
+	m := &gauge{
 		prometheusTotal: *prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "total_online",
@@ -32,18 +29,10 @@ func NewTotalOnline(config *TotalOnlineConfig) TotalOnline {
 			config.Tags,
 		),
 	}
-	_ = prometheus.Register(m.prometheusTotal)
+	if config.MustRegister {
+		prometheus.MustRegister(m.prometheusTotal)
+	} else {
+		_ = prometheus.Register(m.prometheusTotal)
+	}
 	return m
-}
-
-func (m *totalOnline) Set(tags []string, value float64) {
-	m.prometheusTotal.WithLabelValues(tags...).Set(value)
-}
-
-func (m *totalOnline) Reset() {
-	m.prometheusTotal.Reset()
-}
-
-func (m *totalOnline) Inc(tags []string) {
-	m.prometheusTotal.WithLabelValues(tags...).Inc()
 }

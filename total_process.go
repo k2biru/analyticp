@@ -28,7 +28,7 @@ func NewTotalProcess(config *TotalProcessConfig) TotalProcess {
 		prometheusTotal: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "total_process",
-				Help: "Total consume",
+				Help: "Total process",
 				ConstLabels: prometheus.Labels{
 					"app":     config.App,
 					"process": config.Process,
